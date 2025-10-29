@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Multi-Tenant Blog{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {% load static %}
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- 🔷 Navbar -->
+    <nav class="p-4 flex justify-between items-center text-white shadow-md"
+        style="background-color: {{ request.tenant.theme_color|default:'#4f46e5' }}">
+
+        <!-- 🏢 Tenant branding -->
+        <div class="flex items-center space-x-3">
+            {% if request.tenant.logo %}
+            <div class="flex-shrink-0">
+                <img src="{{ request.tenant.logo.url }}" alt="{{ request.tenant.name }}"
+                    class="h-10 w-auto object-contain rounded-md shadow-md border border-white/30 bg-white p-1" />
+            </div>
+            {% endif %}
+            <h1 class="text-xl font-semibold tracking-wide whitespace-nowrap">
+                {{ request.tenant.name|default:"Multi-Tenant Blog" }}
+            </h1>
+        </div>
+
+        <!-- 👤 User dropdown / Login -->
+        <div class="flex items-center space-x-4">
+            {% if user.is_authenticated %}
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open"
+                    class="flex items-center space-x-1 focus:outline-none hover:text-gray-200">
+                    <span class="font-medium">{{ user.username }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Dropdown -->
+                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 transform scale-95"
+                    x-transition:enter-end="opacity-100 transform scale-100"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100 transform scale-100"
+                    x-transition:leave-end="opacity-0 transform scale-95"
+                    class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-lg shadow-lg z-50">
+                    <a href="/my-posts/" class="block px-4 py-2 hover:bg-gray-100">My Posts</a>
+                    <a href="/admin/" class="block px-4 py-2 hover:bg-gray-100">Admin</a>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <a href="{% url 'login' %}" class="bg-white text-indigo-600 px-3 py-1 rounded hover:bg-gray-200">
+                Login
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- 🔶 Page content -->
+    <main class="container mx-auto mt-6 p-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 🔻 Footer -->
+    <footer class="bg-gray-800 text-white p-3 text-center mt-10">
+        © 2025 Multi-Tenant Blog
+    </footer>
+
+</body>
+
+</html>

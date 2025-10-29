@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+</head>
+
+<body>
+    {% extends 'blog/base.html' %}
+    {% block title %}Sign Up{% endblock %}
+
+    {% block content %}
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+            Create Your Account
+        </h2>
+
+        {% for message in messages %}
+        <div class="bg-{{ message.tags }}-100 text-{{ message.tags }}-700 p-3 rounded mb-4">
+            {{ message }}
+        </div>
+        {% endfor %}
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Username</label>
+                <input type="text" name="username" required
+                    class="w-full border rounded p-2 focus:ring focus:ring-indigo-300">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" required
+                    class="w-full border rounded p-2 focus:ring focus:ring-indigo-300">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <input type="password" name="confirm_password" required
+                    class="w-full border rounded p-2 focus:ring focus:ring-indigo-300">
+            </div>
+
+
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
+                Register
+            </button>
+        </form>
+
+        <p class="text-sm text-gray-600 text-center mt-4">
+            Already have an account?
+            <a href="{% url 'login' %}" class="text-indigo-600 hover:underline">Login</a>
+        </p>
+    </div>
+    {% endblock %}
+
+</body>
+
+</html>

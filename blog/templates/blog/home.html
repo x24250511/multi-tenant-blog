@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Multi-Tenant Blog</title>
+</head>
+
+<body>
+    {% extends 'blog/base.html' %}
+    {% block title %}Home{% endblock %}
+    {% block content %}
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Recent Posts</h2>
+
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_post' %}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            + Create Post
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+            Login to Create Post
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for post in posts %}
+        <div class="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition">
+            <h3 class="text-xl font-semibold mb-2">{{ post.title }}</h3>
+            <p class="text-sm text-gray-600">
+                by {{ post.author.username }} on {{ post.created_at|date:"M d, Y" }}
+            </p>
+            <p class="mt-2 text-gray-700">{{ post.content|truncatewords:20 }}</p>
+            <a href="{% url 'view_post' post.id %}" class="text-indigo-600 mt-3 inline-block">
+                Read more →
+            </a>
+        </div>
+        {% empty %}
+        <p>No posts yet.</p>
+        {% endfor %}
+    </div>
+    {% endblock %}
+
+
+
+    </ul>
+</body>
+
+</html>

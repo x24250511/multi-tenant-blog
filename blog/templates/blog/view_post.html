@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ post.title }} - {{ request.tenant.name }}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js for dropdowns/interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {% load static %}
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- 🔷 Navbar -->
+    <nav class="p-4 text-white flex justify-between items-center shadow-md"
+        style="background-color: {{ request.tenant.theme_color|default:'#4f46e5' }}">
+
+        <div class="flex items-center space-x-3">
+            {% if request.tenant.logo %}
+            <img src="{{ request.tenant.logo.url }}" alt="{{ request.tenant.name }}"
+                class="h-10 w-auto object-contain rounded-md shadow-md border border-white/30 bg-white p-1" />
+            {% endif %}
+            <h1 class="text-xl font-semibold tracking-wide">
+                {{ request.tenant.name|default:"Multi-Tenant Blog" }}
+            </h1>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            {% if user.is_authenticated %}
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open"
+                    class="flex items-center space-x-1 focus:outline-none hover:text-gray-200">
+                    <span class="font-medium">{{ user.username }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" @click.away="open = false" x-transition
+                    class="absolute right-0 mt-2 w-44 bg-white text-gray-800 rounded-lg shadow-lg z-50">
+                    <a href="/my-posts/" class="block px-4 py-2 hover:bg-gray-100">My Posts</a>
+                    <a href="/admin/" class="block px-4 py-2 hover:bg-gray-100">Admin</a>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <a href="{% url 'login' %}" class="bg-white text-indigo-600 px-3 py-1 rounded hover:bg-gray-200">
+                Login
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- 🔹 Post Container -->
+    <main class="container mx-auto mt-8 px-4">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-10">
+            <h1 class="text-3xl font-bold text-gray-900 mb-3">{{ post.title }}</h1>
+            <p class="text-sm text-gray-600 mb-4">
+                by <span class="font-semibold text-gray-800">{{ post.author.username }}</span> •
+                {{ post.created_at|date:"F j, Y, g:i a" }}
+            </p>
+            <hr class="my-4 border-gray-200">
+            <div class="text-gray-800 leading-relaxed whitespace-pre-line">
+                {{ post.content }}
+            </div>
+        </div>
+
+        <!-- 🔹 Comments Section -->
+        <!-- 🔹 Comments Section -->
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Comments</h2>
+
+            {% if comments %}
+            <ul class="space-y-5 mb-6">
+                {% for comment in comments %}
+                <li class="border-b pb-3">
+                    <p class="text-gray-700 mb-1">{{ comment.text }}</p>
+                    <p class="text-xs text-gray-500">
+                        by {{ comment.author.username }} • {{ comment.created_at|date:"M d, Y H:i" }}
+                    </p>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-gray-500 mb-6">No comments yet. Be the first to comment!</p>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            <form method="POST" class="space-y-3">
+                {% csrf_token %}
+                <textarea name="text" placeholder="Write your comment..."
+                    class="w-full border rounded p-3 h-28 focus:ring focus:ring-indigo-300"></textarea>
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    Post Comment
+                </button>
+            </form>
+            {% else %}
+            <p class="text-sm text-gray-600">
+                <a href="{% url 'login' %}" class="text-indigo-600 hover:underline">Login</a> to add a comment.
+            </p>
+            {% endif %}
+        </div>
+
+
+        {% if user.is_authenticated %}
+        <form method="POST" class="space-y-3">
+            {% csrf_token %}
+            <textarea name="text" placeholder="Write your comment..."
+                class="w-full border rounded p-3 h-28 focus:ring focus:ring-indigo-300"></textarea>
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                Post Comment
+            </button>
+        </form>
+        {% else %}
+        <p class="text-sm text-gray-600">
+            <a href="{% url 'login' %}" class="text-indigo-600 hover:underline">Login</a> to add a comment.
+        </p>
+        {% endif %}
+        </div>
+
+        <!-- 🔹 Back Link -->
+        <div class="max-w-4xl mx-auto mt-8 text-center">
+            <a href="{% url 'home' %}" class="text-indigo-600 hover:underline font-medium">
+                ← Back to all posts
+            </a>
+        </div>
+    </main>
+
+    <!-- 🔻 Footer -->
+    <footer class="bg-gray-800 text-white p-3 text-center mt-10">
+        © 2025 Multi-Tenant Blog
+    </footer>
+
+</body>
+
+</html>

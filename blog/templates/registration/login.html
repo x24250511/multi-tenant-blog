@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+</head>
+
+<body>
+    {% extends 'blog/base.html' %}
+    {% block title %}Login{% endblock %}
+
+    {% block content %}
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
+
+        {% if form.errors %}
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+            Invalid username or password. Please try again.
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="id_username" class="block text-sm font-medium text-gray-700">Username</label>
+                {{ form.username }}
+            </div>
+
+            <div>
+                <label for="id_password" class="block text-sm font-medium text-gray-700">Password</label>
+                {{ form.password }}
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
+                Login
+            </button>
+        </form>
+
+        <p class="text-sm text-gray-600 text-center mt-4">
+            Don’t have an account?
+            <a href="{% url 'register_tenant' %}" class="text-indigo-600 hover:underline">
+                Create one now
+            </a>
+        </p>
+    </div>
+    {% endblock %}
+
+
+</body>
+
+</html>
