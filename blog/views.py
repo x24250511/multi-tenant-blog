@@ -10,8 +10,12 @@ from blog.models import Tenant, TenantUser
 
 
 def home(request):
-    posts = Post.objects.filter(tenant=request.tenant).order_by('-created_at')
-    return render(request, 'blog/home.html', {'posts': posts})
+    tenant = getattr(request, 'tenant', None)
+    if tenant:
+        posts = Post.objects.filter(tenant=tenant)
+    else:
+        posts = Post.objects.none()
+    return render(request, 'blog/home.html', {'posts': posts, 'tenant': tenant})
 
 
 def register_tenant(request):
